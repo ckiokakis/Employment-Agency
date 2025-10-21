@@ -1,0 +1,309 @@
+{{!< layout}}
+ <section class="vh-50" style="background-color: #e7e9ee;">
+  <div class="container py-5 h-50">
+    <div class="row d-flex justify-content-center align-items-center h-50">
+      <div class="col col-lg-6 mb-4 mb-lg-0">
+        <div class="card mb-3" style="border-radius: .5rem;">
+          <div class="row g-0">
+            <div class="col-md-4 profile-bg-color text-center text-white"
+              style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
+              <img src="{{employeeData.profilePicturePath}}" alt="Avatar" class="img-fluid my-5" style="width: 80px;" />
+              <h5>{{employeeData.firstName}} {{employeeData.lastName}}</h5>
+              <p>{{employeeData.occupation}}/{{employeeData.specialty}}</p>
+              <button id="viewPdfButton" class="btn cards-button me-2" name="{{employeeData.cvPath}}">View CV</button>
+              <i class="far fa-edit mb-5"></i>
+            </div>
+            <div class="col-md-8">
+              <div class="card-body p-4">
+                <h6>Information</h6>
+                <hr class="mt-0 mb-4">
+                <div class="row pt-1">
+                  <div class="col-6 mb-3">
+                    <h6>Email</h6>
+                    <p class="text-muted">{{employeeData.email}}</p>
+                  </div>
+                  <div class="col-6 mb-3">
+                    <h6>Phone 1</h6>
+                    <p class="text-muted">{{employeeData.phone1}}</p>
+                  </div>
+                </div>
+                <div class="row pt-1">
+                  <div class="col-6 mb-3">
+                    <h6>Address/Region</h6>
+                    <p class="text-muted">{{employeeData.address}}/{{employeeData.region}}</p>
+                  </div>
+                  <div class="col-6 mb-3">
+                    <h6>Phone 2</h6>
+                    <p class="text-muted">{{employeeData.phone2}}</p>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-end mt-3">
+                  <form id="uploadProfilePictureForm" enctype="multipart/form-data">
+                    <label class="btn cards-button me-2">
+                      <input type="file" id="profilePictureInput"
+                        style="display: none" name="profilePicture" accept="image/*">
+                        Upload Image
+                    </label>
+                  </form>
+                  <form id="uploadCVForm" enctype="multipart/form-data">
+                    <label class="btn cards-button me-2">
+                      <input type="file" id="cvInput" style="display: none" style="" name="cv"
+                        accept=".pdf,.doc,.docx">
+                        Upload CV
+                    </label>
+                  </form>
+                  <button type="submit" class="btn cards-button" value="edit"
+                    onclick="openEditEmployeeModal()">Edit</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<h2 style="text-align: center;">My applications</h2>
+
+<div class="cards">
+  {{#each jobs as |job|}}
+  <div class="card mb-3" style="max-width: 540px;">
+    <div class="row g-0">
+      <div class="col-md-4">
+        <img src="{{job.imagePath}}" class="card-img" alt="...">
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <h5 class="card-title"><a href="#" id="jobTitleLink" class="job-link" data-job-id="{{job.jobId}}">{{job.title}}</a></h5>
+          <p class="card-text">{{job.description}}</p>
+          <p class="card-text"><small class="text-muted">{{job.companyName}}</small></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{/each}}
+</div>
+
+{{!-- Employee's updating info modal --}}
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-body">
+        <form id="editEmployeeForm" method="post" action="/employee">
+          <div class="mb-3">
+            <label for="editFirstName" class="form-label"><b>First Name</b></label>
+            <input type="text" class="form-control" name="firstName" value="{{employeeData.firstName}}">
+          </div>
+          <div class="mb-3">
+            <label for="editFirstName" class="form-label"><b>Last Name</b></label>
+            <input type="text" class="form-control" name="lastName" value="{{employeeData.lastName}}">
+          </div>
+          <div class="mb-3">
+            <label for="editEmail" class="form-label"><b>Email</b></label>
+            <input type="email" class="form-control" name="email" value="{{employeeData.email}}">
+          </div>
+          <div class="mb-3">
+            <label for="editPhone1" class="form-label"><b>Phone 1</b></label>
+            <input type="tel" class="form-control" name="phone1" value="{{employeeData.phone1}}">
+          </div>
+          <div class="mb-3">
+            <label for="editPhone2" class="form-label"><b>Phone 2</b></label>
+            <input type="tel" class="form-control" name="phone2" value="{{employeeData.phone2}}">
+          </div>
+          <div class="mb-3">
+            <label for="editAddress" class="form-label">Address</label>
+            <input type="text" class="form-control" name="address" value="{{employeeData.address}}">
+          </div>
+          <div class="mb-3">
+            <label for="editRegion" class="form-label"><b>Region</b></label>
+            <input type="text" class="form-control" name="region" value="{{employeeData.region}}">
+          </div>
+          <div class="mb-3">
+            <select id="occupationDropdown" name="occupation" onchange="updateSpecialties()" style="border: 1px solid #ced4da; border-radius: 4px;">
+              <option value="{{employeeData.occupation}}">Select Occupation</option>
+              {{#each jobCategories.occupations}}
+              <option value="{{@index}}">{{this.name}}</option>
+              {{/each}}
+            </select>
+            <select id="specialtyDropdown" name="specialty" style="border: 1px solid #ced4da; border-radius: 4px;">
+              <option value="{{employeeData.specialty}}">Select Specialty</option>
+            </select>
+          </div>
+        </form>
+        <button type="button" class="btn btn-close btn-secondary close" data-bs-dismiss="modal" style="font-size: 15px;"></button>
+        
+       <div class="modal-footer" style="text-align: right;">
+        <button type="button" class="btn btn-primary" id="saveChangesButton">Save Changes</button>
+      </div>
+      </div>
+    </div>
+  </div>
+
+{{!-- Job's ad hyperlinked info modal --}}
+<div id="jobModal" class="modal">
+  <div class="modal-content">
+    <button type="button" class="btn btn-close btn-secondary close" data-bs-dismiss="modal" style="font-size: 15px;"></button>
+    <div class="label-field">
+      <label for="modalJobTitle"><b>Job Title:</b></label>
+      <p id="modalJobTitle"></p>
+    </div>
+    <div class="label-field">
+      <label for="modalCompanyName"><b>Company Name:</b></label>
+      <p id="modalCompanyName"></p>
+    </div>
+    <div class="label-field">
+      <label for="modalJobRegion"><b>Region:</b></label>
+      <p id="modalJobRegion"></p>
+    </div>
+    <div class="label-field">
+      <label for="modalJobOccupation"><b>Occupation:</b></label>
+      <p id="modalJobOccupation"></p>
+    </div>
+    <div class="label-field">
+      <label for="modalJobSpecialty"><b>Specialty:</b></label>
+      <p id="modalJobSpecialty"></p>
+    </div>
+    <div class="label-field">
+      <label for="modalJobDescription"><b>Description:</b></label>
+      <p id="modalJobDescription"></p>
+    </div>
+    <div class="label-field">
+      <label for="modalExtendedJobDescription"><b>Extended Description:</b></label>
+      <p id="modalExtendedJobDescription"></p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  const occupationsData = {{{ json jobCategories }}};
+
+  function updateSpecialties() {
+    const occupationSelect = document.getElementById('occupationDropdown');
+    const specialtySelect = document.getElementById('specialtyDropdown');
+    const selectedOccupationIndex = occupationSelect.value;
+    specialtySelect.innerHTML = '<option value="{{employeeData.specialty}}">Select Specialty</option>';
+    if (selectedOccupationIndex !== "") {
+      const specialties = occupationsData.occupations[selectedOccupationIndex].specialties;
+      specialties.forEach(specialty => {
+        const option = document.createElement('option');
+        option.value = specialty;
+        option.textContent = specialty;
+        specialtySelect.appendChild(option);
+      });
+    }
+  }
+
+//Edit employee's profile info modal
+  document.addEventListener('DOMContentLoaded', function () {
+
+    window.openEditEmployeeModal = function () {
+      var modal = document.getElementById("myModal");
+      var span = document.getElementsByClassName("btn-close")[0];
+      if (modal) {
+        modal.style.display = "block";
+        span.onclick = function () {
+          modal.style.display = "none";
+        }
+        window.onclick = function (event) {
+          if (event.target == modal) {
+            modal.style.display = "none";
+          }
+        }
+      } else {
+        console.error('Modal element not found.');
+      }
+    }
+  });
+
+  document.getElementById('saveChangesButton').addEventListener('click', function () {
+    document.getElementById('editEmployeeForm').submit();
+  });
+
+//Upload profile picture
+  document.getElementById('profilePictureInput').addEventListener('change', async (event) => {
+    const form = document.getElementById('uploadProfilePictureForm');
+    const formData = new FormData(form);
+
+    const response = await fetch('/employee/uploadProfilePicture', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (response.ok) {
+      alert('Profile picture uploaded successfully: ' + result.fileName);
+    } else {
+      alert('Profile picture upload failed');
+    }
+  });
+
+//Upload CV
+  document.getElementById('cvInput').addEventListener('change', async (event) => {
+    const form = document.getElementById('uploadCVForm');
+    const formData = new FormData(form);
+
+    const response = await fetch('/employee/uploadCV', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (response.ok) {
+      alert('CV uploaded successfully: ' + result.fileName);
+    } else {
+      alert('CV upload failed');
+    }
+  });
+
+  document.getElementById('viewPdfButton').addEventListener('click', () => {
+    const pdfUrl = event.target.name;
+    window.open(pdfUrl, '_blank');
+  });
+
+//All the information for the job ad
+  document.addEventListener('DOMContentLoaded', (event) => {
+    const modal = document.getElementById('jobModal');
+    const span = document.getElementsByClassName('btn-close')[1];
+    const jobTitle = document.getElementById('modalJobTitle');
+    const jobDescription = document.getElementById('modalJobDescription');
+    const companyName = document.getElementById('modalCompanyName');
+    const jobExtendedDescription = document.getElementById('modalExtendedJobDescription');
+    const jobRegion = document.getElementById('modalJobRegion');
+    const jobOccupation = document.getElementById('modalJobOccupation');
+    const jobSpecialty = document.getElementById('modalJobSpecialty');
+
+
+    document.querySelectorAll('.job-link').forEach(link => {
+      link.onclick = function () {
+        const jobId = this.getAttribute('data-job-id');
+
+        axios.get(`http://localhost:3000/v1/job/${jobId}`)
+          .then(response => {
+            const job = response.data;
+            jobTitle.innerText = job.title;
+            companyName.innerText = job.companyName;
+            jobDescription.innerText = job.description;
+            jobExtendedDescription.innerText = job.extendedDescr;
+            jobRegion.innerText = job.region;
+            jobOccupation.innerText = job.occupation;
+            jobSpecialty.innerText = job.specialty;
+            modal.style.display = 'block';
+          })
+          .catch(error => {
+            console.error('Error fetching job details:', error);
+          });
+
+        return false;
+      };
+    });
+
+    span.onclick = function () {
+      modal.style.display = 'none';
+    };
+
+    window.onclick = function (event) {
+      if (event.target == modal) {
+        modal.style.display = 'none';
+      }
+    };
+  });
+</script>
